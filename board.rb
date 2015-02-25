@@ -1,4 +1,5 @@
-require_relative "./piece.rb"
+require_relative "./pieces/pieces.rb"
+require "byebug"
 
 class Board
 
@@ -55,11 +56,17 @@ class Board
   end
 
   def render
-    @grid.map do |row|
+    render_grid = @grid.map do |row|
       row.map do |piece|
-        piece.inspect
-      end.join("")
-    end.join("\n")
+        if piece.nil?
+          " "
+        else
+          piece.symbol
+        end
+      end.join(" | ").reverse
+    end.join("\n").reverse
+
+    puts render_grid
   end
 
   def [](position)
@@ -73,8 +80,15 @@ class Board
   end
 
   def move(start, end_pos)
-    raise ArgumentError.new("No piece at #{start}.") if self[start].nil?
-    raise ArgumentError.new("Invalid end position.") if !self[start].moves.include?(end_pos)
+    if start.any? { |el| el.nil? } || end_pos.any? { |el| el.nil? }
+      raise ArgumentError.new("Invalid input. Follow the format.")
+    elsif self[start].nil?
+      raise ArgumentError.new("No piece at that position.")
+    elsif !self[start].moves.include?(end_pos)
+      raise ArgumentError.new("Invalid end position.")
+    elsif !self[start].valid_moves.include?(end_pos)
+      raise ArgumentError.new("Can't leave your king in check.")
+    end
 
     self[end_pos] = self[start]
     self[start] = nil
@@ -92,6 +106,7 @@ class Board
     dup_board[start] = nil
 
     dup_board[end_pos].pos = end_pos
+    dup_board
   end
 
   def get_pieces(color)
@@ -112,6 +127,10 @@ class Board
     opposing_pieces = get_pieces(opposing_color)
 
     opposing_pieces.any? { |opp_piece| opp_piece.moves.include?(get_king_pos(color))}
+  end
+
+  def checkmate?(color)
+    in_check?(color) && get_pieces(color).all? { |piece| piece.valid_moves.empty? }
   end
 
   def get_king_pos(color)
