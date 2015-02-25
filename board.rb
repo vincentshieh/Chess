@@ -6,6 +6,9 @@ class Board
 
   def initialize
     @grid = Array.new(8) { Array.new(8) }
+  end
+
+  def set_default_board
     set_higher_pieces
     set_pawns
   end
@@ -79,6 +82,18 @@ class Board
     self[end_pos].pos = end_pos
   end
 
+  def move!(start, end_pos)
+    dup_board = self.dup
+
+    raise ArgumentError.new("No piece at #{start}.") if dup_board[start].nil?
+    raise ArgumentError.new("Invalid end position.") if !dup_board[start].moves.include?(end_pos)
+
+    dup_board[end_pos] = dup_board[start]
+    dup_board[start] = nil
+
+    dup_board[end_pos].pos = end_pos
+  end
+
   def get_pieces(color)
     pieces = []
 
@@ -101,5 +116,15 @@ class Board
 
   def get_king_pos(color)
     get_pieces(color).select { |piece| piece.is_a?(King) }.first.pos
+  end
+
+  def dup
+    dup_board = Board.new
+
+    @grid.flatten.compact.each do |piece|
+      dup_board[piece.pos] = piece.dup(dup_board)
+    end
+
+    dup_board
   end
 end

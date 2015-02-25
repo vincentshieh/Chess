@@ -28,6 +28,16 @@ class Piece
   def blocked?(pos)
     !board[pos].nil?
   end
+
+  def dup(board)
+    self.class.new(pos.dup, board, color)
+  end
+
+  def valid_moves
+    self.moves.select do |move|
+      !board.move!(pos, move).in_check?(color)
+    end
+  end
 end
 
 class SlidingPiece < Piece
