@@ -1,5 +1,6 @@
 require_relative "./pieces/pieces.rb"
 require "byebug"
+require "colorize"
 
 class Board
 
@@ -56,14 +57,39 @@ class Board
   end
 
   def render
+    alpha = [" ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", " "]
+
     render_grid = @grid.map do |row|
       row.map do |piece|
         if piece.nil?
-          " "
+          "   "
         else
-          piece.symbol
+          if piece.color == :white
+            piece.symbol.colorize(:white)
+          else
+            piece.symbol.colorize(:black)
+          end
         end
-      end.join(" | ").reverse
+      end
+    end.unshift(alpha).push(alpha)
+
+    render_grid.each_with_index do |row, i|
+      next if i == 0 || i == 9
+      row.unshift(i.to_s).push(i.to_s)
+    end
+
+    render_grid = render_grid.map.with_index do |row, row_i|
+      row.map.with_index do |piece, col_i|
+        if col_i.odd? && row_i.odd?
+          piece.colorize(:background => :blue)
+        elsif col_i.odd? && row_i.even?
+          piece.colorize(:background => :red)
+        elsif col_i.even? && row_i.odd?
+          piece.colorize(:background => :red)
+        elsif col_i.even? && row_i.even?
+          piece.colorize(:background => :blue)
+        end
+      end.join("").reverse
     end.join("\n").reverse
 
     puts render_grid

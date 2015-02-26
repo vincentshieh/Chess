@@ -1,6 +1,7 @@
 require_relative "./pieces/pieces.rb"
 require_relative "./board.rb"
 require "byebug"
+require "yaml"
 
 class Game
   def initialize(player1, player2)
@@ -12,10 +13,49 @@ class Game
   end
 
   def play
+    @board.render
     until @board.checkmate?(:white) || @board.checkmate?(:black)
-      break if @player1.play_turn
+      begin
+        break if @player1.play_turn
+        @board.render
+      rescue ArgumentError => e
+        puts "#{e.message}"
+        retry
+      rescue RuntimeError => e
+        puts "#{e.message}"
+        retry
+      end
 
-      @player2.play_turn
+      puts "Do you want to save your game? [y/n]"
+      answer = gets.chomp.downcase
+
+      if answer == "y"
+        File.open("chess.txt", "w") do |f|
+          f.puts self.to_yaml
+        end
+        return
+      end
+
+      begin
+        @player2.play_turn
+        @board.render
+      rescue ArgumentError => e
+        puts "#{e.message}"
+        retry
+      rescue RuntimeError => e
+        puts "#{e.message}"
+        retry
+      end
+
+      puts "Do you want to save your game? [y/n]"
+      answer = gets.chomp.downcase
+
+      if answer == "y"
+        File.open("chess.txt", "w") do |f|
+          f.puts self.to_yaml
+        end
+        return
+      end
     end
     @board.render
     puts "Checkmate! #{winner.to_s.capitalize} wins!"
@@ -23,6 +63,11 @@ class Game
 
   def winner
     @board.checkmate?(:white) ? :black : :white
+  end
+
+  def self.load
+    game = File.readlines("chess.txt").join
+    YAML::load(game)
   end
 end
 
@@ -40,19 +85,29 @@ class HumanPlayer
   end
 
   def play_turn
-    @board.render
-    puts "Enter start position and end position for your move: start_x,start_y,end_x,end_y"
-    puts "Format: first coordinate (1-8), second coordinate (a-h)"
+    puts "Enter start position and end position for your move:"
+    puts "start_row,start_column,end_row,end_column"
+    puts "Format: row coordinate (1-8), column coordinate (a-h)"
     player_move = gets.chomp.split(",")
+
+    unless player_move.length == 4
+      raise ArgumentError.new("Please follow the input format.")
+    end
+
     player_start_pos = player_move.take(2).map { |el| POSITIONS[el] }
+    unless @board[player_start_pos].color == @color
+      raise RuntimeError.new("Choose your own piece.")
+    end
     player_end_pos = player_move.drop(2).map { |el| POSITIONS[el] }
 
     @board.move(player_start_pos, player_end_pos)
+    if @color == :white ? @board.in_check?(:black) : @board.in_check?(:white)
+      puts "Check."
+    end
     @color == :white ? @board.checkmate?(:black) : @board.checkmate?(:white)
 
   rescue ArgumentError => e
     puts "#{e.message}"
     retry
-
   end
 end

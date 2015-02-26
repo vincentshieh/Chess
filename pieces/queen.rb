@@ -7,6 +7,6 @@ class Queen < SlidingPiece
   end
 
   def symbol
-    color == :white ? "♕" : "♛"
+    color == :white ? " ♕ " : " ♛ "
   end
 end

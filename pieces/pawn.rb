@@ -9,7 +9,7 @@ class Pawn < Piece
   end
 
   def symbol
-    color == :white ? "♙" : "♟"
+    color == :white ? " ♙ " : " ♟ "
   end
 
   def capture_moves

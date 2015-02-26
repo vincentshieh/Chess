@@ -7,6 +7,6 @@ class King < SteppingPiece
   end
 
   def symbol
-    color == :white ? "♔" : "♚"
+    color == :white ? " ♔ " : " ♚ "
   end
 end

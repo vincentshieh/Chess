@@ -7,6 +7,6 @@ class Knight < SteppingPiece
   end
 
   def symbol
-    color == :white ? "♘" : "♞"
+    color == :white ? " ♘ " : " ♞ "
   end
 end
