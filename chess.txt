@@ -1,5 +1,5 @@
 --- !ruby/object:Game
-player2: !ruby/object:HumanPlayer
+player2: &2 !ruby/object:HumanPlayer
   name: player2
   color: :black
   board: &1 !ruby/object:Board
@@ -232,4 +232,5 @@ player1: !ruby/object:HumanPlayer
   name: player1
   color: :white
   board: *1
+current_player: *2
 board: *1

@@ -5,6 +5,7 @@ require "yaml"
 class Game
   def initialize(player1, player2)
     @player1, @player2 = player1, player2
+    @current_player = @player1
     @board = Board.new
     @board.set_default_board
     @player1.board = @board
@@ -13,35 +14,16 @@ class Game
 
   def self.load
     game = File.readlines("chess.txt").join
-    YAML::load(game)
+    game = YAML::load(game)
+    game.play
   end
 
   def play
     @board.render
     until @board.checkmate?(:white) || @board.checkmate?(:black)
       begin
-        break if @player1.play_turn
-        @board.render
-      rescue ArgumentError => e
-        puts "#{e.message}"
-        retry
-      rescue RuntimeError => e
-        puts "#{e.message}"
-        retry
-      end
-
-      puts "Do you want to save your game? [y/n]"
-      answer = gets.chomp.downcase
-
-      if answer == "y"
-        File.open("chess.txt", "w") do |f|
-          f.puts self.to_yaml
-        end
-        return
-      end
-
-      begin
-        break if @player2.play_turn
+        break if @current_player.play_turn
+        @current_player = @current_player == @player1 ? @player2 : @player1
         @board.render
       rescue ArgumentError => e
         puts "#{e.message}"
@@ -72,6 +54,7 @@ end
 
 class HumanPlayer
   attr_accessor :board
+  attr_reader :name, :color
 
   POSITIONS = { "a" => 0, "b" => 1, "c" => 2, "d" => 3,
                 "e" => 4, "f" => 5, "g" => 6, "h" => 7,
@@ -83,7 +66,8 @@ class HumanPlayer
   end
 
   def play_turn
-    puts "Enter start position and end position for your move in the follow format:"
+    puts color.to_s.capitalize + "'s turn."
+    puts "Enter start and end positions for your move in the follow format:"
     puts "start_position, end_position (eg. 'c2, c4')"
     player_move = gets.chomp.split(", ").map { |pos| pos.split("") }.flatten
 
