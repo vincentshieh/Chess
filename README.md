@@ -11,7 +11,9 @@ Chess is a classic strategy board game structured with Ruby classes. It utilizes
 3. Navigate into the Chess folder using the following command:
 ```cd Chess```
 4. Open up IRB (Interactive Ruby) by typing the command:
-``` irb```
+```ruby
+irb
+```
 5. Require the Ruby game file by typing:
 ```require './game'```
 6. Load the seed game by typing:
