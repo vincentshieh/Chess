@@ -9,8 +9,8 @@ class SteppingPiece < Piece
 
     move_dirs.each do |delta|
       current_move = [pos[0] + delta[0], pos[1] + delta[1]]
-      unless edge_of_board?(current_move) || (blocked?(current_move) &&
-        board[current_move].color == color)
+      unless edge_of_board?(current_move) ||
+        (blocked?(current_move) && board[current_move].color == color)
         valid_moves << current_move
       end
     end

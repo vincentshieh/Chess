@@ -14,17 +14,19 @@ class SlidingPiece < Piece
   end
 
   def valid_moves_in_dir(delta)
-    multiplier = 1
     valid_moves = []
-    current_move = [pos[0] + multiplier * delta[0], pos[1] + multiplier * delta[1]]
+    multiplier = 1
+    current_move = [pos[0] + multiplier * delta[0],
+                    pos[1] + multiplier * delta[1]]
 
-    until edge_of_board?(current_move) || (blocked?(current_move) &&
-      board[current_move].color == color)
+    until edge_of_board?(current_move) ||
+      (blocked?(current_move) && board[current_move].color == color)
       valid_moves << current_move
       break if blocked?(current_move)
 
       multiplier += 1
-      current_move = [pos[0] + multiplier * delta[0], pos[1] + multiplier * delta[1]]
+      current_move = [pos[0] + multiplier * delta[0],
+                      pos[1] + multiplier * delta[1]]
     end
 
     valid_moves
