@@ -30,7 +30,7 @@ The following screenshots summarize the demo instructions:
 [demo3]: ./screenshots/demo3.png
 
 ## Code Highlights
-* The Rook, Bishop, and Queen classes inherit from the SlidingPiece class, which uses the following method to return an array of valid move positions for one sliding direction:
+The Rook, Bishop, and Queen classes inherit from the SlidingPiece class, which uses the following method to return an array of valid move positions for one sliding direction:
 ```ruby
 def valid_moves_in_dir(delta)
   valid_moves = []
