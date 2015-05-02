@@ -4,14 +4,6 @@ class Pawn < Piece
   WHITE_DELTAS = [[1, 0], [2, 0], [1, 1], [1, -1]]
   BLACK_DELTAS = [[-1, 0], [-2, 0], [-1, 1], [-1, -1]]
 
-  def moves
-    capture_moves + straight_moves
-  end
-
-  def symbol
-    color == :white ? " ♙ " : " ♟ "
-  end
-
   def capture_moves
     valid_moves = []
     deltas = move_dirs.drop(2)
@@ -29,6 +21,15 @@ class Pawn < Piece
     end
 
     valid_moves
+  end
+
+  def move_dirs
+    return WHITE_DELTAS if color == :white
+    BLACK_DELTAS
+  end
+
+  def moves
+    capture_moves + straight_moves
   end
 
   def straight_moves
@@ -54,8 +55,7 @@ class Pawn < Piece
     valid_moves
   end
 
-  def move_dirs
-    return WHITE_DELTAS if color == :white
-    BLACK_DELTAS
+  def symbol
+    color == :white ? " ♙ " : " ♟ "
   end
 end

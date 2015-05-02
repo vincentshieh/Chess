@@ -1,6 +1,5 @@
 require_relative "./pieces/pieces.rb"
 require_relative "./board.rb"
-require "byebug"
 require "yaml"
 
 class Game
@@ -10,6 +9,11 @@ class Game
     @board.set_default_board
     @player1.board = @board
     @player2.board = @board
+  end
+
+  def self.load
+    game = File.readlines("chess.txt").join
+    YAML::load(game)
   end
 
   def play
@@ -37,7 +41,7 @@ class Game
       end
 
       begin
-        @player2.play_turn
+        break if @player2.play_turn
         @board.render
       rescue ArgumentError => e
         puts "#{e.message}"
@@ -64,15 +68,9 @@ class Game
   def winner
     @board.checkmate?(:white) ? :black : :white
   end
-
-  def self.load
-    game = File.readlines("chess.txt").join
-    YAML::load(game)
-  end
 end
 
 class HumanPlayer
-
   attr_accessor :board
 
   POSITIONS = { "a" => 0, "b" => 1, "c" => 2, "d" => 3,
@@ -85,26 +83,26 @@ class HumanPlayer
   end
 
   def play_turn
-    puts "Enter start position and end position for your move:"
-    puts "start_row,start_column,end_row,end_column"
-    puts "Format: row coordinate (1-8), column coordinate (a-h)"
-    player_move = gets.chomp.split(",")
+    puts "Enter start position and end position for your move in the follow format:"
+    puts "start_position, end_position (eg. 'c2, c4')"
+    player_move = gets.chomp.split(", ").map { |pos| pos.split("") }.flatten
 
     unless player_move.length == 4
       raise ArgumentError.new("Please follow the input format.")
     end
 
-    player_start_pos = player_move.take(2).map { |el| POSITIONS[el] }
+    player_start_pos = player_move.take(2).reverse.map { |el| POSITIONS[el] }
     unless @board[player_start_pos].color == @color
       raise RuntimeError.new("Choose your own piece.")
     end
-    player_end_pos = player_move.drop(2).map { |el| POSITIONS[el] }
+    player_end_pos = player_move.drop(2).reverse.map { |el| POSITIONS[el] }
 
     @board.move(player_start_pos, player_end_pos)
-    if @color == :white ? @board.in_check?(:black) : @board.in_check?(:white)
+    checkmate = @color == :white ? @board.checkmate?(:black) : @board.checkmate?(:white)
+    if @color == :white ? @board.in_check?(:black) : @board.in_check?(:white) && !checkmate
       puts "Check."
     end
-    @color == :white ? @board.checkmate?(:black) : @board.checkmate?(:white)
+    checkmate
 
   rescue ArgumentError => e
     puts "#{e.message}"
