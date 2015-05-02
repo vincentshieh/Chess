@@ -67,7 +67,7 @@ class HumanPlayer
 
   def play_turn
     puts color.to_s.capitalize + "'s turn."
-    puts "Enter start and end positions for your move in the follow format:"
+    puts "Enter start and end positions for your move in the following format:"
     puts "start_position, end_position (eg. 'c2, c4')"
     player_move = gets.chomp.split(", ").map { |pos| pos.split("") }.flatten
 
